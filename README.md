@@ -9,6 +9,8 @@ This repository is the assignments that I have done when I took this course in T
 
 It's **ONLY MY PERSONAL** solutions & efforts for the assignments, and it **DOES NOT REPRESENT** the correct answer. For those who are taking this course, please DO NOT copy any of this code to your own submission!
 
+If you have any suggestion or doubts, please contact me @ lz321@ie.cuhk.edu.hk
+
 ## License
 
 Copyrighted. Not for open source usage.
