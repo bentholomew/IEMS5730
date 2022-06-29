@@ -1,0 +1,14 @@
+# Data files
+*.zip
+*.csv
+*.xlsx
+*.gz
+shakespear*
+web-Google*
+crimes/
+*.pptx
+*.txt
+*.tsv
+*.pdf
+*mysql*/
+*Drafts*
