@@ -3,7 +3,7 @@
 
 <h2 align=center>Declaration</h2>
 
-<img src="Screenshots\Declaration.jpg" style="zoom:50%;" />
+<img src="Screenshots/Declaration.jpg" style="zoom:50%;" />
 
 
 
@@ -20,14 +20,14 @@ if __name__=="__main__":
 
     ''' Prepare the context and build the graph '''
     spark = SparkSession.builder.appName("hw5_q1").getOrCreate()
-    e = spark.read.csv(r"mooc_actions.tsv",sep='\t',header=True)\
-                .withColumnRenamed("USERID","src")\
-                .withColumnRenamed("TARGETID","dst")\
+    e = spark.read.csv(r"mooc_actions.tsv",sep='/t',header=True)/
+                .withColumnRenamed("USERID","src")/
+                .withColumnRenamed("TARGETID","dst")/
                 .withColumnRenamed("TIMESTAMP","timestamp")
-    v = spark.read.csv(r"vertices.tsv",sep='\t',header=True)
+    v = spark.read.csv(r"vertices.tsv",sep='/t',header=True)
     g = GraphFrame(v, e)
 
-    print("\n***********  Q1(a): Report Graph Properties  *********** ")
+    print("/n***********  Q1(a): Report Graph Properties  *********** ")
     print("The Number of vertices: {}".format(g.vertices.count()))
     print("The Number of users: {}".format(g.filterVertices("type=='User'").vertices.count()))
     print("The Number of Course Activities: {}".format( g.filterVertices("type=='Course Activity'").vertices.count()))
@@ -36,20 +36,20 @@ if __name__=="__main__":
     print("The vertex with the largest out-degree: {}".format(g.outDegrees.rdd.sortBy(lambda x:x[1],ascending=False).take(1)))
 
     
-    print("\n***********  Q1(b): Filter & Create Subgraphs  *********** ")
+    print("/n***********  Q1(b): Filter & Create Subgraphs  *********** ")
     sg = g.filterEdges("timestamp > 10000 AND timestamp<=50000").dropIsolatedVertices()
     print("The Number of vertices: {}".format(sg.vertices.count()))
     print("The Number of edges: {}".format(sg.edges.count()))
 
     
-    print("\n***********  Q1(c): Motifs/Patterns Search  *********** ")
+    print("/n***********  Q1(c): Motifs/Patterns Search  *********** ")
     motif1 = sg.find("(v1)-[e1]->(v3);(v2)-[e2]->(v3)").filter("v1.id!=v2.id").filter("e1.timestamp<e2.timestamp")
     motif2 = sg.find("(v1)-[e1]->(v2);(v2)-[e2]->(v3)")
-    motif3 = sg.find("(v1)-[e1]->(v2);(v4)-[e4]->(v2);(v1)-[e3]->(v3);(v4)-[e2]->(v3)")\
-               .filter("v1.id!=v4.id AND v2.id!=v3.id")\
+    motif3 = sg.find("(v1)-[e1]->(v2);(v4)-[e4]->(v2);(v1)-[e3]->(v3);(v4)-[e2]->(v3)")/
+               .filter("v1.id!=v4.id AND v2.id!=v3.id")/
                .filter("e1.timestamp<e2.timestamp AND e2.timestamp<e3.timestamp AND e3.timestamp<e4.timestamp")
-    motif4 = sg.find("(v2)-[e1]->(v1);(v2)-[e3]->(v3);(v4)-[e4]->(v3);(v4)-[e2]->(v5)")\
-               .filter("v2.id!=v4.id AND v1.id!=v3.id AND v3.id!=v5.id AND v1.id!=v5.id")\
+    motif4 = sg.find("(v2)-[e1]->(v1);(v2)-[e3]->(v3);(v4)-[e4]->(v3);(v4)-[e2]->(v5)")/
+               .filter("v2.id!=v4.id AND v1.id!=v3.id AND v3.id!=v5.id AND v1.id!=v5.id")/
                .filter("e1.timestamp<e2.timestamp AND e2.timestamp<e3.timestamp AND e3.timestamp<e4.timestamp")
     motifs = zip([1,2,3,4],[motif1.count(),motif2.count(),motif3.count(),motif4.count()])
     for motif in motifs:
@@ -60,17 +60,17 @@ Upload the files to HDFS, and submit the code to IE DIC:
 
 ```shell
 $ hadoop dfs -copyFromLocal mooc_actions.tsv vertices.tsv ./
-$ spark-submit --repositories https://repos.spark-packages.org \
-               --packages graphframes:graphframes:0.7.0-spark2.3-s_2.11 \
-               --master yarn \
-               --deploy-mode cluster \
-               --files mooc_actions.tsv,vertices.tsv \
+$ spark-submit --repositories https://repos.spark-packages.org /
+               --packages graphframes:graphframes:0.7.0-spark2.3-s_2.11 /
+               --master yarn /
+               --deploy-mode cluster /
+               --files mooc_actions.tsv,vertices.tsv /
                q1.py
 ```
 
 Check result from the `stdout` :
 
-![](Screenshots\Q1-res.jpg)
+![](Screenshots/Q1-res.jpg)
 
 
 
@@ -117,7 +117,7 @@ object Q2App {
         val numVerticesInLargest = graph.connectedComponents().vertices
                                                               .groupBy(_._2)
                                                               .map(x=>(x._1, x._2.size))
-                                                              .top(1)(Ordering.by(_._2)).mkString("\n")
+                                                              .top(1)(Ordering.by(_._2)).mkString("/n")
         // max-iter=1, if > 1, raises OOM from IEDIC, 
         // cannot be solved by configuring --num-executors or executor-memory
         // solved by configuring --driver-memory 15G
@@ -135,11 +135,11 @@ object Q2App {
         println("********** Q2(c): Personalized PageRank **********")
         val top20PPR4330 = graph.personalizedPageRank(4330,tol=0.01,resetProb=0.15)
                                         .vertices
-                                        .top(25)(Ordering.by(_._2)).mkString("\n") // Include the node itself, with 5 more nodes
+                                        .top(25)(Ordering.by(_._2)).mkString("/n") // Include the node itself, with 5 more nodes
                                     
         val top20PPR5730 = graph.personalizedPageRank(5730,tol=0.01,resetProb=0.15)
                                         .vertices
-                                        .top(25)(Ordering.by(_._2)).mkString("\n") // Include the node itself, with 5 more nodes
+                                        .top(25)(Ordering.by(_._2)).mkString("/n") // Include the node itself, with 5 more nodes
 
         val vertices5730 = graph.personalizedPageRank(5730,tol=0.01,resetProb=0.15)
                                 .vertices.top(2000)(Ordering.by(_._2)).map(_._1)
@@ -161,7 +161,7 @@ object Q2App {
                                             .vertices.map(_._2).distinct().count()
         val topCommVerticesCount = lib.LabelPropagation.run(graph,maxSteps=50)
                                                         .vertices.map(x=>(x._2,1))
-                                                    	.reduceByKey(_+_).top(10)(Ordering.by(_._2)).mkString("\n")
+                                                    	.reduceByKey(_+_).top(10)(Ordering.by(_._2)).mkString("/n")
 
         println(s"Number of Communities: $numCommunities")
         println(s"Number of Vertices in the Largest Communities (Top10): $topCommVerticesCount")
@@ -179,7 +179,7 @@ object Q2App {
                                     triplet => Iterator((triplet.dstId, triplet.srcAttr + 1)), // Map the triplets, and send message to the destination of each triplet
                                     (a,b) => math.max(a,b) // Reduce all the received messages
                                 )
-        val res = g_res.vertices.top(20)(Ordering.by(_._2)).mkString("\n")
+        val res = g_res.vertices.top(20)(Ordering.by(_._2)).mkString("/n")
         println(s"top 20 nodes with the largest distance from the root: $res")
 
         sc.stop()
@@ -205,21 +205,21 @@ libraryDependencies += "org.apache.spark" %% "spark-graphx" % "2.3.0"
 Get the jar, and submit the jar to IE DIC, with additional memory / #executors configuration
 
 ```shell
-$ spark-submit --class "Q2App" \
-               --master yarn \
-               --deploy-mode cluster \
-               --driver-memory 15G \
-               --num-executors 20 \
+$ spark-submit --class "Q2App" /
+               --master yarn /
+               --deploy-mode cluster /
+               --driver-memory 15G /
+               --num-executors 20 /
                iesm5730-homework5-q2_2.11-1.0.jar
 ```
 
 Check result from the `stdout` 
 
-![](Screenshots\Q2-res.png)
+![](Screenshots/Q2-res.png)
 
-\** Note that for `stronglyConnectedComponents` , the `maxIter` param is set to be 3 since a larger value will cause `JavaHeapSpaceError` , and this could not be solved by configuring the `--num-executors` or `--executor-memory` , and could be solved by configuring `--driver-memory` .  A further test with spark-shell on the IE-DIC indicates : `stronglyConnectedComponents(1):169343` `stronglyConnectedComponents(4):141597 ` and `stronglyConnectedComponents(5):141346`
+/** Note that for `stronglyConnectedComponents` , the `maxIter` param is set to be 3 since a larger value will cause `JavaHeapSpaceError` , and this could not be solved by configuring the `--num-executors` or `--executor-memory` , and could be solved by configuring `--driver-memory` .  A further test with spark-shell on the IE-DIC indicates : `stronglyConnectedComponents(1):169343` `stronglyConnectedComponents(4):141597 ` and `stronglyConnectedComponents(5):141346`
 
-![](Screenshots\Q2-stronglyConnectedComponents.jpg)
+![](Screenshots/Q2-stronglyConnectedComponents.jpg)
 
 
 
@@ -234,8 +234,8 @@ Prerequisite: Add a unique row key for each row in the googlebooks-b dataset wit
 ```python
 '''Option#1: with pandas'''
 # import pandas as pd
-# gbook = pd.read_csv("googlebooks-eng-all-1gram-20120701-b",sep='\t',header=None)
-# gbook.to_csv("gbook_b_with_rowkey",sep='\t',header=None)
+# gbook = pd.read_csv("googlebooks-eng-all-1gram-20120701-b",sep='/t',header=None)
+# gbook.to_csv("gbook_b_with_rowkey",sep='/t',header=None)
 
 '''Option2: FIle I/O'''
 src = 'googlebooks-eng-all-1gram-20120701-b'
@@ -245,13 +245,13 @@ with open(src,'r') as f1:
     with open(dst,"w") as f2:
         index = 0
         for line in f1.readlines():
-            f2.write(str(index) + "\t" + line)
+            f2.write(str(index) + "/t" + line)
             index += 1
 ```
 
-![](Screenshots\Q3-gen-rowkey.jpg)
+![](Screenshots/Q3-gen-rowkey.jpg)
 
-\** `Rowkey` starts from **0** to **61551916**: for spliting among the datanodes, the rowkeys separators are designed to **[20, 40, 60]**
+/** `Rowkey` starts from **0** to **61551916**: for spliting among the datanodes, the rowkeys separators are designed to **[20, 40, 60]**
 
 (1) Upload the file onto HDFS, and (2) create a table (3) convert to HFiles with `ImportTsv ` (4) Load the HFiles into the table 
 
@@ -264,10 +264,10 @@ $ hbase shell
 > create 'hw5_q3_1155162635', 'gbook', SPLITS => ['20', '40', '60']
 
 # 3. Generate HFiles with ImportTsv, columns = [bigram, year, match_count, volume_count]
-$ hbase org.apache.hadoop.hbase.mapreduce.ImportTsv \
-        -Dimporttsv.columns=HBASE_ROW_KEY,gbook:bigram,gbook:year,gbook:match_count,gbook:volume_count \
-        -Dimporttsv.bulk.output=/user/s1155162635/hbase/hw5_q3 \
-        hw5_q3_1155162635 \
+$ hbase org.apache.hadoop.hbase.mapreduce.ImportTsv /
+        -Dimporttsv.columns=HBASE_ROW_KEY,gbook:bigram,gbook:year,gbook:match_count,gbook:volume_count /
+        -Dimporttsv.bulk.output=/user/s1155162635/hbase/hw5_q3 /
+        hw5_q3_1155162635 /
         /user/s1155162635/gbook_b_with_rowkey
 
 # 4. Load the HFiles into the created table
@@ -279,15 +279,15 @@ $ hbase shell
 > scan 'hw5_q3_1155162635', {FILTER => "PageFilter(1)"}
 
 #X: Local Test
-#$ bin/hbase org.apache.hadoop.hbase.mapreduce.ImportTsv \
-#    -Dimporttsv.columns=HBASE_ROW_KEY,gbook:bigram,gbook:year,gbook:match_count,gbook:volume_count \
-#    hw5_q3_1155162635 \
+#$ bin/hbase org.apache.hadoop.hbase.mapreduce.ImportTsv /
+#    -Dimporttsv.columns=HBASE_ROW_KEY,gbook:bigram,gbook:year,gbook:match_count,gbook:volume_count /
+#    hw5_q3_1155162635 /
 #    file:///home/ben/HW#5/gbook_b_with_rowkey
 ```
 
 Result
 
-![](Screenshots\Q3-a.jpg)
+![](Screenshots/Q3-a.jpg)
 
 
 
@@ -303,7 +303,7 @@ Insert the record, with rowkey as 0000
 > get 'hw5_q3_1155162635', '0000'
 ```
 
-![](Screenshots\Q3-b-1.jpg)
+![](Screenshots/Q3-b-1.jpg)
 
 Get all the records in the Year 1671 with occurrences larger than 100. The former condition is mateched with `BinaryComparator`, and the latter condition is matched with `RegexStringComparator`
 
@@ -311,7 +311,7 @@ Get all the records in the Year 1671 with occurrences larger than 100. The forme
 > scan 'hw5_q3_1155162635', {FILTER=>"SingleColumnValueFilter('gbook','year',=,'binary:1671') AND SingleColumnValueFilter('gbook','match_count',=,'regexstring:^[1-9][0-9]{2,}')"} 
 ```
 
-![](Screenshots\Q3-b-2.jpg)
+![](Screenshots/Q3-b-2.jpg)
 
 Delete the 14 records above one by one in the shell, this could be efficiently done with batch processing using HBase API in Java MapReduce Programs
 
@@ -334,7 +334,7 @@ Delete the 14 records above one by one in the shell, this could be efficiently d
 > scan 'hw5_q3_1155162635', {FILTER=>"SingleColumnValueFilter('gbook','year',=,'binary:1671') AND SingleColumnValueFilter('gbook','match_count',=,'regexstring:^[1-9][0-9]{2,}')"} 
 ```
 
-![](Screenshots\Q3-b-3.jpg)
+![](Screenshots/Q3-b-3.jpg)
 
 
 
@@ -351,8 +351,8 @@ from pyspark import SparkConf, SparkContext
 
 if __name__=="__main__":
     sc = SparkContext.getOrCreate()
-    ratings = sc.textFile('ratings.csv').filter(lambda x:x[0]!='u')\
-                                        .map(lambda line:line.split(",")[:-1])\
+    ratings = sc.textFile('ratings.csv').filter(lambda x:x[0]!='u')/
+                                        .map(lambda line:line.split(",")[:-1])/
                                         .map(lambda l: Rating(int(l[0]), int(l[1]), float(l[2])))
 
     rank = 50 # Dimensions/Clusters
@@ -369,15 +369,15 @@ Upload data files to HDFS, and submit the code to IE DIC:
 
 ```shell
 $ hadoop dfs -copyFromLocal ratings.csv 
-$ spark-submit --repositories https://repos.spark-packages.org \
-               --master yarn \
-               --deploy-mode cluster \
+$ spark-submit --repositories https://repos.spark-packages.org /
+               --master yarn /
+               --deploy-mode cluster /
                q4_1.py
 ```
 
 Check result from the `stdout` <u>(Please zoom in on the PDF to check the high-resolution screenshot)</u>
 
-![](Screenshots\Q4-1-res.png)
+![](Screenshots/Q4-1-res.png)
 
 
 
@@ -408,9 +408,9 @@ if __name__=="__main__":
     param_iters = [5, 10, 20] # Too many will cause OOM
     param_ranks = [20, 50, 100]
     param_regs = [0.1 ,0.01, 0.001]
-    paramGrid = ParamGridBuilder().addGrid(als.maxIter,param_iters)\
-                                  .addGrid(als.rank,param_ranks)\
-                                  .addGrid(als.regParam,param_regs)\
+    paramGrid = ParamGridBuilder().addGrid(als.maxIter,param_iters)/
+                                  .addGrid(als.rank,param_ranks)/
+                                  .addGrid(als.regParam,param_regs)/
                                   .build()
 
     '''************* Alternative: Only GridSearch 2 Params, Fix Iteration at 10************* '''
@@ -423,8 +423,8 @@ if __name__=="__main__":
     # # ParamGrid        
     # param_ranks = [50, 150, 300]
     # param_regs = [0.1 , 0.001]
-    # paramGrid = ParamGridBuilder().addGrid(als.rank,param_ranks)\
-    #                               .addGrid(als.regParam,param_regs)\
+    # paramGrid = ParamGridBuilder().addGrid(als.rank,param_ranks)/
+    #                               .addGrid(als.regParam,param_regs)/
     #                               .build()
 
     # Evaluation Metrics: MSE
@@ -457,19 +457,19 @@ if __name__=="__main__":
 Submit the code to IE DIC:
 
 ```shell
-$ spark-submit --repositories https://repos.spark-packages.org \
-               --master yarn \
-               --deploy-mode cluster \
-               --num-executors 20 \
-               --executor-memory 20G \
+$ spark-submit --repositories https://repos.spark-packages.org /
+               --master yarn /
+               --deploy-mode cluster /
+               --num-executors 20 /
+               --executor-memory 20G /
                q4_2.py
 ```
 
 Check result from the `stdout`
 
-![](Screenshots\Q4-b.jpg)
+![](Screenshots/Q4-b.jpg)
 
-\** The 4th line of the output is too long to display, manually copy as follows:
+/** The 4th line of the output is too long to display, manually copy as follows:
 
 The best-performing model params are: `rank=20, maxIter=20, regParam=0.01` , the corresponding `MSE` is  `0.645`
 

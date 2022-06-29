@@ -4,7 +4,7 @@
 
 <h2 align=center>Declaration</h2>
 
-![](Screenshots\0-Declaration.png)
+![](Screenshots/0-Declaration.png)
 
 [TOC]
 
@@ -22,7 +22,7 @@
   $ sudo apt-get update
   $ sudo apt-get install ca-certificates curl gnupg lsb-release
   $ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-  $ echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $ echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu /
     $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
   $ sudo apt-get update
   $ sudo apt-get install docker-ce docker-ce-cli containerd.io -y
@@ -89,7 +89,7 @@
 
   Output:
 
-  ![](Screenshots\1.1-Kubeadm-Init.png)
+  ![](Screenshots/1.1-Kubeadm-Init.png)
 
 - Config `kubectl`  as `root`
 
@@ -116,7 +116,7 @@ $ kubectl cluster-info
   $ kubectl get nodes
   ```
   
-  ![](Screenshots\1.2-kubectl-get-nodes.png)
+  ![](Screenshots/1.2-kubectl-get-nodes.png)
 
 - Running the `helloworld` program
 
@@ -126,11 +126,11 @@ $ kubectl cluster-info
 
   Check the pod status
   
-  ![](Screenshots\1.3-hello-world-pods.png)
+  ![](Screenshots/1.3-hello-world-pods.png)
   
   Screenshot Result 
   
-  ![](Screenshots\1.4-hello-world-k8s.png)
+  ![](Screenshots/1.4-hello-world-k8s.png)
 
 ## **Part b[40 Marks]** Multi-node Kubernetes Cluster Setup
 
@@ -138,7 +138,7 @@ $ kubectl cluster-info
 
   Create a machine image with `docker` and `kubeadm` `kubectl` `kubelet` installed and configured, and generate 4 new VM instances(1 master + 3 slaves) with the image, in the same regional network under GCP
 
-  ![](Screenshots\2.0-Setting-up-4-VMs.png)
+  ![](Screenshots/2.0-Setting-up-4-VMs.png)
 
 - For `master`, log in as `root`, and then run:
 
@@ -148,7 +148,7 @@ $ kubectl cluster-info
 
   With output like:
 
-  ![](Screenshots\2.0-k8s-master-init.png)
+  ![](Screenshots/2.0-k8s-master-init.png)
 
   Then, config the `kubectl`  + set up `calico` pod network + untaint master node
 
@@ -161,7 +161,7 @@ $ kubectl cluster-info
 - For `slaves`, log in as `root`, and then run as the `kubeadm init` output indicates:
 
   ```shell
-  $ kubeadm join 10.170.0.24:6443 --token 6iqvxe.m99g4vgwbv7s3ly9 \
+  $ kubeadm join 10.170.0.24:6443 --token 6iqvxe.m99g4vgwbv7s3ly9 /
           --discovery-token-ca-cert-hash sha256:99ed49602d1b765642ff40390e73367d5f52d8eda3d3c58ae2d7a8f2d2f4081c 
   ```
 
@@ -174,7 +174,7 @@ $ kubectl cluster-info
 
   Final output
 
-  ![](Screenshots\2.0-k8s-multi-node-cluster-setup.png)
+  ![](Screenshots/2.0-k8s-multi-node-cluster-setup.png)
 
 - Deploy `hadoop.yaml`
 
@@ -199,7 +199,7 @@ $ kubectl cluster-info
 
 - Result & Runtime, from YARN application manager via `port 32088`
 
-  ![](Screenshots\2.4-Terasort-Yarn-2GB&20GB.png)
+  ![](Screenshots/2.4-Terasort-Yarn-2GB&20GB.png)
 
   2GB: TeraGen(32s) + Terasort(157s) + TeraValidate(34s) = 223s 
 
@@ -211,15 +211,15 @@ $ kubectl cluster-info
 
 - Create a k8s cluster manually with the WebUI on Google Cloud Console, with config as follows[^2][^3]:
 
-  \- Basics: standard mode, named as k8s-serverless
+  /- Basics: standard mode, named as k8s-serverless
 
-  \- Nodesize: 3 ~~4 (different from the homework instructions, stay the same as part b, the yaml file will configure 3 nodes anyway~~)
+  /- Nodesize: 3 ~~4 (different from the homework instructions, stay the same as part b, the yaml file will configure 3 nodes anyway~~)
 
-  \- Nodetype: n1-standard-2, 100GB harddisk
+  /- Nodetype: n1-standard-2, 100GB harddisk
 
   | Basics                                         | Nodesize                                                   | Nodetype                                         |
   | ---------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------ |
-  | ![](Screenshots\3.1-GKE-WebUI-init-basics.png) | <img src="Screenshots\3.1-GKE-WebUI-init-nodesize.png"  /> | ![](Screenshots\3.1-GKE-WebUI-init-nodetype.png) |
+  | ![](Screenshots/3.1-GKE-WebUI-init-basics.png) | <img src="Screenshots/3.1-GKE-WebUI-init-nodesize.png"  /> | ![](Screenshots/3.1-GKE-WebUI-init-nodetype.png) |
 
 - Access & Authorize the k8s cluster with <u>Cloud Shell</u>, checking the cluster status
 
@@ -227,7 +227,7 @@ $ kubectl cluster-info
   $ gcloud container clusters get-credentials k8s-serverless --zone asia-east1-a --project excellent-camp-338915
   ```
 
-  ![](Screenshots\3.2-gcp-cloudshell.png)
+  ![](Screenshots/3.2-gcp-cloudshell.png)
 
 - Deploy `hadoop.yaml`
 
@@ -237,11 +237,11 @@ $ kubectl cluster-info
 
   Configure firewall on GCloud console panel, Checking the external IP address of `hdfs-master`: 35.225.109.6
 
-  ![](Screenshots\3.2-gcp-vm-console-k8s-serverless.png)
+  ![](Screenshots/3.2-gcp-vm-console-k8s-serverless.png)
 
   Entering the `hadoop-hdfs-master` WebUI panel via `port 32007`: http://35.225.109.6:32007
 
-  ![](Screenshots\3.3-k8s-serverless-hadoop-port32007.png)
+  ![](Screenshots/3.3-k8s-serverless-hadoop-port32007.png)
 
 - Enter the command line of `hdfs-master` pod, run terasort program with Hadoop on k8s-serverless
 
@@ -262,11 +262,11 @@ $ kubectl cluster-info
 
   | Cloud Shell Terminal                                    | Yarn Application Manager                         |
   | ------------------------------------------------------- | ------------------------------------------------ |
-  | ![](Screenshots\3.4-Runtime-Screenshot-Cloud-shell.png) | ![](Screenshots\3.4-Runtime-Screenshot-Yarn.png) |
+  | ![](Screenshots/3.4-Runtime-Screenshot-Cloud-shell.png) | ![](Screenshots/3.4-Runtime-Screenshot-Yarn.png) |
 
   Runtime & Result:
 
-  ![](Screenshots\3.4-Result-Screenshot-Yarn.png)
+  ![](Screenshots/3.4-Result-Screenshot-Yarn.png)
 
   2GB: TeraGen(36s) + Terasort(126s) + TeraValidate(32s) = 194s
 
@@ -278,7 +278,7 @@ $ kubectl cluster-info
 
 - Runtime Performance Comparison (seconds)
 
-  \- 2GB
+  /- 2GB
 
   |                    | TeraGen | TeraSort | TeraValidate | Total |
   | ------------------ | ------- | -------- | ------------ | ----- |
@@ -286,7 +286,7 @@ $ kubectl cluster-info
   | **Multi-Node k8s** | 32      | 157      | 34           | 223   |
   | **Serverless k8s** | 36      | 126      | 32           | 194   |
 
-  \- 20GB
+  /- 20GB
 
   |                    | TeraGen | TeraSort | TeraValidate | Total |
   | ------------------ | ------- | -------- | ------------ | ----- |
@@ -298,11 +298,11 @@ $ kubectl cluster-info
 
   Overall, Hadoop within k8s performs less efficient then Hadoop within YARN. An important prerequisite is that since the data generated by `teragen` program are stored locally on respective pods/VMs (didn't actually transmit the generated data but the status and programs), so the difference in performance mainly lies in the exchange efficiency of the commands / instrutions / status info among the namenode and the datanodes. 
   
-  \- <u>YARN</u>: Namenode and datanode are located on different VMs, and the traffic among namenode and datanodes are carried via the network connecting the VMs, in this case, ... . 
+  /- <u>YARN</u>: Namenode and datanode are located on different VMs, and the traffic among namenode and datanodes are carried via the network connecting the VMs, in this case, ... . 
   
-  \- <u>Multi-Node k8s</u>: Namenode and each datanode was virtualized into a pod, and the traffic among pods are carried via an extra virtual network layer compared with YARN (in this case, the Calico CNI[^4] ), which induces additional routings and unnecessary delays, hence performs the worst. 
+  /- <u>Multi-Node k8s</u>: Namenode and each datanode was virtualized into a pod, and the traffic among pods are carried via an extra virtual network layer compared with YARN (in this case, the Calico CNI[^4] ), which induces additional routings and unnecessary delays, hence performs the worst. 
   
-  \- <u>Serverless k8s</u>: The GKE uses a different network configuration among the pods, and provides a more efficient management platform along with multiple add-on services for k8s clusters.[^4][^7] , especially in terms of network exchange efficiency, hence reducing the price of communication among pods. And this makes pods traffic among serverless k8s pods more efficient and the cluster performs better than multi-node k8s and even better than YARN somtimes(e.g. 20GB `terasort` program) under the same type of machines.
+  /- <u>Serverless k8s</u>: The GKE uses a different network configuration among the pods, and provides a more efficient management platform along with multiple add-on services for k8s clusters.[^4][^7] , especially in terms of network exchange efficiency, hence reducing the price of communication among pods. And this makes pods traffic among serverless k8s pods more efficient and the cluster performs better than multi-node k8s and even better than YARN somtimes(e.g. 20GB `terasort` program) under the same type of machines.
   
   
 
@@ -322,7 +322,7 @@ $ kubectl cluster-info
 
   Checking `kubectl get events`: A new app was created and scheduled to replace the deleted `hello-world `app, the same time as the old one dies. And since there're 2 replicas according to the `hello-world-demo.yaml` file, after the first container dies, the second container (in this case, pod named `hello-world-xplmz`) would come as backup and put into production to support the app function seamlessly despite failure of original container.
 
-  ![](Screenshots\5.2-delete-helloworld-pod-events.png)
+  ![](Screenshots/5.2-delete-helloworld-pod-events.png)
 
   
 
@@ -336,7 +336,7 @@ $ kubectl cluster-info
   $ ./bin/hadoop jar ./share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.2.jar terasort terasort/input20GB terasort/output20GB-2
   ```
 
-  ![](Screenshots\5.3-rerun-terasort-yarn.png)
+  ![](Screenshots/5.3-rerun-terasort-yarn.png)
 
   Open another Cloud Shell terminal,kill `hadoop-datanode-3` `yarn-node-3` ,run and check the status of the pod
 
@@ -346,7 +346,7 @@ $ kubectl cluster-info
   $ kubectl get pods -o wide
   ```
 
-  ![](Screenshots\5.4-kill-pods-status.png)
+  ![](Screenshots/5.4-kill-pods-status.png)
 
   Open another terminal and track the locality of each mapper/reducer by monitoring the logging of `yarn-master`, as well as the Yarn WebUI via `port 32088`, but cannot track the running application logs since the container port for TrackingUI is not open in the given `hadoop.yaml`
 
@@ -356,13 +356,13 @@ $ kubectl cluster-info
 
   WebUI & Shell Logs: After deleting `Yarn-node-3`, Yarn reselect `yarn-node-1` as scheduler to restart the job, after a timout of 600s(10 min), which corresponds to the WebUI records and log output.  And the job was restarted to run from scratch.
 
-  ![](Screenshots\5.4-kill-pods-yarn-WebUI.png)  
+  ![](Screenshots/5.4-kill-pods-yarn-WebUI.png)  
 
-    ![](Screenshots\5.4-kill-pods-yarn-master.png)
+    ![](Screenshots/5.4-kill-pods-yarn-master.png)
 
   Also check k8s event logs from `kubectl get events`, note that the pods didn't restart after deleting this time, since there's no replicas.
 
-  ![](Screenshots\5.4-kill-pods-events.png)
+  ![](Screenshots/5.4-kill-pods-events.png)
 
   To sum up, in this containerized hadoop, the fault tolerance was mainly realized by Yarn to reschedule the running job properly without the deleted pods restarted. This could be imagined as shutting down a VM during a MapReduce job running on manually configured / provisioned hadoop over multiple clusters. 
 
