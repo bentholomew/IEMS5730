@@ -4,7 +4,7 @@
 
 <h2 align=center>Declaration</h2>
 
-<img src="Screenshots\HW#3-Declaration.jpg" style="zoom: 67%;" />
+<img src="Screenshots/HW#3-Declaration.jpg" style="zoom: 67%;" />
 
 [TOC]
 
@@ -80,9 +80,9 @@ Re-allocate the `vmem/pmem ratio` in `yarn.site.xml`, in namenode and 3 datanode
 
 Entering `spark-shell`
 
-![](Screenshots\q1-b-spark-shell.jpg)
+![](Screenshots/q1-b-spark-shell.jpg)
 
-![](Screenshots\q1-b-yarn.jpg)
+![](Screenshots/q1-b-yarn.jpg)
 
 
 
@@ -110,7 +110,7 @@ if __name__=="__main__":
     # Generate neighbor list for all nodes: (fromNode,(neighbors))
     lines = sc.textFile("hdfs://master:54310/user/hduser/web-Google.txt")
           	  .filter(lambda x: "#" not in x)
-          	  .map(lambda x:x.split("\t"))
+          	  .map(lambda x:x.split("/t"))
     links = lines.groupByKey().mapValues(tuple)
     
     # Generate initial ranks for all distinct nodes: (node,1)
@@ -129,15 +129,15 @@ if __name__=="__main__":
 Submit over `spark-submit`
 
 ```shell
-$ spark-submit \
-    --deploy-mode cluster \
-    --master yarn \
+$ spark-submit /
+    --deploy-mode cluster /
+    --master yarn /
     hw3_q2_a.py
 ```
 
 Top 100 Nodes
 
-![](Screenshots\q2-a-res.jpg)
+![](Screenshots/q2-a-res.jpg)
 
 ### **b) [20 Marks]** Advanced implementation of PageRank
 
@@ -145,9 +145,9 @@ The default num of partitions after executing `sc.textFile` is 2, shown as the f
 
 > The `textFile` method also takes an optional second argument for controlling the number of partitions of the file. By default, Spark creates one partition for each block of the file (blocks being 128MB by default in HDFS), but you can also ask for a higher number of partitions by passing a larger value. Note that you cannot have fewer partitions than blocks.
 
-The optimal partitions values, theorectically, should be related to the number of cluster cpu cores. In my case (4  `n1-standard-2` gcp instance, each with a vcpu of 2 cores), the partition number should be 8, or 2\*8=16, or 3\*8=24. etc.
+The optimal partitions values, theorectically, should be related to the number of cluster cpu cores. In my case (4  `n1-standard-2` gcp instance, each with a vcpu of 2 cores), the partition number should be 8, or 2/*8=16, or 3/*8=24. etc.
 
-![](Screenshots\q2-b-0.jpg)
+![](Screenshots/q2-b-0.jpg)
 
 `hw3_q2_b_x.py`:  experimenting 3 different parameters: 8 / 10 / 16, take `hw3_q2_b_8.py` for code showcasing
 
@@ -167,7 +167,7 @@ if __name__=="__main__":
     sc = SparkContext(conf=conf)
     lines = sc.textFile("hdfs://master:54310/user/hduser/web-Google.txt")
               .filter(lambda x: "#" not in x)
-              .map(lambda x:x.split("\t"))
+              .map(lambda x:x.split("/t"))
             
     links = lines.groupByKey().mapValues(tuple).partitionBy(8).persist()
     ranks = links.mapValues(lambda x:1)
@@ -181,7 +181,7 @@ if __name__=="__main__":
 
 Performance Comparison & Observations
 
-![](Screenshots\q2-c-1.jpg)
+![](Screenshots/q2-c-1.jpg)
 
 As shown from the above result, <u>8 partitions (2.2 min)</u> claims the highest performance. There're 8 cpu cores, meaning that at most 8 parallel jobs could be executed at a time. And 8 partitions fully utilized the parallel resources within 1 round.
 
@@ -197,7 +197,7 @@ And noteworthy, the final step of implementation code involves `sortBy()`, which
 
 Copy the crime data into HDFS, and enter the pyspark shell via `pyspark` (master default configured as yarn in Q1(b)):
 
-![](Screenshots\q3-0.jpg)
+![](Screenshots/q3-0.jpg)
 
 ### **a) [10 Marks]** Preprocessing
 
@@ -209,7 +209,7 @@ crime_a.show()
 crime_a.count()
 ```
 
-![](Screenshots\q3-a.jpg)
+![](Screenshots/q3-a.jpg)
 
 ### **b) [10 Marks]** Count the no. of each type offenses & find most crimes occurring time-slot/shift
 
@@ -222,13 +222,13 @@ crime.groupby("SHIFT").count().show()
 
 Most crimes happen in EVENING shift according to the result
 
-![](Screenshots\q3-b.jpg)
+![](Screenshots/q3-b.jpg)
 
 ### **c) [15 Marks] ** Merge 9 Tables into one and compute the percentage of gun offense yearly
 
 Download the 9  `crime_incidents_in_201x.csv` files into `crimes/` folder and upload it to HDFS, and enter the `pyspark` shell:
 
-![](Screenshots\q3-c-0.jpg)
+![](Screenshots/q3-c-0.jpg)
 
 Type the following command:
 
@@ -238,15 +238,15 @@ from pyspark.sql.window import Window
 crimes = spark.read.csv("hdfs://master:54310/user/hduser/crimes/",header=True)
 crimes.createOrReplaceTempView("crimes")
 crimes_year_method = spark.sql("SELECT YEAR(TO_DATE(SUBSTRING_INDEX(REPORT_DAT,' ',1),'yyyy/MM/dd')) AS YEAR, METHOD FROM crimes")
-res = crimes_year_method.groupby(['METHOD','YEAR']).count() \
-                      	.withColumn("year_sum",F.sum("count").over(Window.partitionBy("year"))) \
-                      	.withColumn("year_percent",F.col('count')/F.col("year_sum")) \
+res = crimes_year_method.groupby(['METHOD','YEAR']).count() /
+                      	.withColumn("year_sum",F.sum("count").over(Window.partitionBy("year"))) /
+                      	.withColumn("year_percent",F.col('count')/F.col("year_sum")) /
                       	.filter("METHOD=='GUN'")
 res.show()
 res.repartition(1).write.csv("./hw3_q3_c_res", encoding="utf-8", header=True)
 ```
 
-![](Screenshots\q3-c.jpg)
+![](Screenshots/q3-c.jpg)
 
 Since Obama published his 23 executive actions on gun control in 2013[^10], the percentage of gun assaulting crimes `year_percent` showed an obviously declining trend, fluctuating below 6%. The first year 2014 is the most effective,  not only the percentage dropped by 1% from 6.1% to 5.1% , the absolute figure `year_count` also showed a significant decrease, from 2203 to 1964 reducing by almost 10%. However, the situation rebounded in 2015 and 2016, with `year_count` and `year_percent` both increase to an approxiamte level of 2013 before the executive actions take effects. This could be explained by the fact that these executive actions are published under the context of the failure of the previous reform amendment[^11], which actually contributed little to the overall percentage of gun crimes. 
 
@@ -263,7 +263,7 @@ $ sudo chmod 666 /var/run/docker.sock
 $ docker-image-tool.sh -r docker.io/s1155162635 -t v3.2.1 build
 ```
 
-![](Screenshots\q4-a.jpg)
+![](Screenshots/q4-a.jpg)
 
 ### **b) [3 marks]** Push the Docker Images
 
@@ -272,7 +272,7 @@ $ docker login
 $ docker-image-tool.sh -r s1155162635 -t v3.2.1 push
 ```
 
-![](Screenshots\q4-b.jpg)
+![](Screenshots/q4-b.jpg)
 
 ### **c) [4 Marks]** Submit the spark job to IE DIC K8s Cluster
 
@@ -280,23 +280,23 @@ Testing if the `SparkPi` example works under the configured environment
 
 ```shell
 $ globalprotect connect --portal sslvpn.ie.cuhk.edu.hk
-$ bin/spark-submit \
-    --master k8s://https://172.16.5.98:6443 \
-    --deploy-mode cluster \
-    --name spark-pi \
-    --class org.apache.spark.examples.SparkPi \
-    --conf spark.app.name=sparkpi \
-    --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
-    --conf spark.kubernetes.namespace=s1155162635 \
-    --conf spark.kubernetes.container.image=docker.io/s1155162635/spark:v3.2.1 \
-    --conf spark.kubernetes.container.image.pullPolicy=Always \
-    local:///opt/spark/examples/jars/spark-examples_2.12-3.2.1.jar \
+$ bin/spark-submit /
+    --master k8s://https://172.16.5.98:6443 /
+    --deploy-mode cluster /
+    --name spark-pi /
+    --class org.apache.spark.examples.SparkPi /
+    --conf spark.app.name=sparkpi /
+    --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark /
+    --conf spark.kubernetes.namespace=s1155162635 /
+    --conf spark.kubernetes.container.image=docker.io/s1155162635/spark:v3.2.1 /
+    --conf spark.kubernetes.container.image.pullPolicy=Always /
+    local:///opt/spark/examples/jars/spark-examples_2.12-3.2.1.jar /
     1000
 ```
 
 Succeeded as follows:
 
-![](Screenshots\q4-c-0.jpg)
+![](Screenshots/q4-c-0.jpg)
 
 Writing the `word_count.scala` example
 
@@ -339,14 +339,14 @@ $ docker-image-tool.sh -r s1155162635 -t v3.2.1 push
 submit the job via `spark_submit` over k8s
 
 ```shell
-$ bin/spark-submit \
-    --master k8s://https://172.16.5.98:6443 \
-    --class "wordCount" \
-    --deploy-mode cluster \
-    --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
-    --conf spark.kubernetes.namespace=s1155162635 \
-    --conf spark.kubernetes.container.image=docker.io/s1155162635/spark:v3.2.1 \
-    --conf spark.kubernetes.container.image.pullPolicy=Always \
+$ bin/spark-submit /
+    --master k8s://https://172.16.5.98:6443 /
+    --class "wordCount" /
+    --deploy-mode cluster /
+    --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark /
+    --conf spark.kubernetes.namespace=s1155162635 /
+    --conf spark.kubernetes.container.image=docker.io/s1155162635/spark:v3.2.1 /
+    --conf spark.kubernetes.container.image.pullPolicy=Always /
     local:///opt/spark/examples/jars/simple-project_2.12-1.0.jar 
 ```
 
@@ -356,7 +356,7 @@ See the output result
 $ kubectl logs -f wordcount-f95d237fd091f336-driver -n s1155162635
 ```
 
-![](Screenshots\q4-c-1.jpg)
+![](Screenshots/q4-c-1.jpg)
 
 
 
@@ -367,14 +367,14 @@ $ kubectl logs -f wordcount-f95d237fd091f336-driver -n s1155162635
 Execute same as q4 c
 
 ```shell
-$ bin/spark-submit \
-    --master k8s://https://172.16.5.98:6443 \
-    --class "wordCount" \
-    --deploy-mode cluster \
-    --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
-    --conf spark.kubernetes.namespace=s1155162635 \
-    --conf spark.kubernetes.container.image=docker.io/s1155162635/spark:v3.2.1 \
-    --conf spark.kubernetes.container.image.pullPolicy=Always \
+$ bin/spark-submit /
+    --master k8s://https://172.16.5.98:6443 /
+    --class "wordCount" /
+    --deploy-mode cluster /
+    --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark /
+    --conf spark.kubernetes.namespace=s1155162635 /
+    --conf spark.kubernetes.container.image=docker.io/s1155162635/spark:v3.2.1 /
+    --conf spark.kubernetes.container.image.pullPolicy=Always /
     local:///opt/spark/examples/jars/simple-project_2.12-1.0.jar 
 ```
 
@@ -386,7 +386,7 @@ $ kubectl delete pod wordcount-11544d7fd0a979a3-exec-1 -n s1155162635 #delete on
 $ kubectl get pods -n s1155162635
 ```
 
-![](Screenshots\q5-a-1.jpg)
+![](Screenshots/q5-a-1.jpg)
 
 Check the driver pod
 
@@ -394,7 +394,7 @@ Check the driver pod
 $ kubectl logs wordcount-88faf07fd0a95154-driver -n s1155162635| head -n 1000 #check the driver pod
 ```
 
-![](Screenshots\q5-a-2.jpg)
+![](Screenshots/q5-a-2.jpg)
 
 The spark driver detected the lost of the executer and the shuffle files, and then request another executor to resubmit the relevant task (`ShuffleMapTask` according to the screenshot) according to the DAG schedules. The Spark job hence continued and completed at last.
 
@@ -412,11 +412,11 @@ $ kubectl get pods -n s1155162635
 
 On the job running terminal:
 
-![](Screenshots\q5-b-1.jpg)
+![](Screenshots/q5-b-1.jpg)
 
 On another terminal:
 
-![](Screenshots\q5-b-2.jpg)
+![](Screenshots/q5-b-2.jpg)
 
 The above results proves that without the Spark driver, the tasks cannot be rescheduled and the spark job cannot continue to complete.
 

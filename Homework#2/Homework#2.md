@@ -4,7 +4,7 @@
 
 <h2 align=center>Declaration</h2>
 
-<img src="Screenshots\Declaration.jpg" style="zoom:50%;" />
+<img src="Screenshots/Declaration.jpg" style="zoom:50%;" />
 
 [TOC]
 
@@ -32,7 +32,7 @@ hduser@master:~$ source /home/hduser/.bashrc
 
 Check the installation with `pig -help` command
 
-![](Screenshots\q1-a-pig-setup.jpg)
+![](Screenshots/q1-a-pig-setup.jpg)
 
 ### **(b) [5 Marks]** Upload to HDFS & Join them into one table 
 
@@ -64,24 +64,24 @@ Write Pig scripts directly in `grunt` shell to join the two file into one table
 
 ```shell
 grunt> a = LOAD 'hdfs://master:54310/user/hduser/gbook-a' 
-		   USING PigStorage('\t') 
+		   USING PigStorage('/t') 
 		   AS (bigram:chararray,year:int,match_count:int,volume_count:int);
 grunt> b = LOAD 'hdfs://master:54310/user/hduser/gbook-b' 
-		   USING PigStorage('\t') 
+		   USING PigStorage('/t') 
 		   AS (bigram:chararray,year:int,match_count:int,volume_count:int);
 grunt> c = UNION a,b;
-grunt> STORE c INTO 'hdfs://master:54310/user/hduser/gbook-all' USING PigStorage('\t');
+grunt> STORE c INTO 'hdfs://master:54310/user/hduser/gbook-all' USING PigStorage('/t');
 ```
 
 Execution result
 
-![](Screenshots\q1-b-pig-union.jpg)
+![](Screenshots/q1-b-pig-union.jpg)
 
 Validation
 
-\- using `cd ` `ls` to check the result, and `fs -getmerge` command to aggregate the output of (b) into a single file
+/- using `cd ` `ls` to check the result, and `fs -getmerge` command to aggregate the output of (b) into a single file
 
-\- Checking if line number of the combined table equals the sum of the two original files: 86618505(a) + 61551917(b) = 148170422(all)
+/- Checking if line number of the combined table equals the sum of the two original files: 86618505(a) + 61551917(b) = 148170422(all)
 
 ```shell
 grunt> fs -getmerge -nl /user/hduser/gbook-all /home/hduser/gbook-all-res
@@ -91,7 +91,7 @@ hduser@master:~$ wc -l googlebooks-eng-all-1gram-20120701-a
 hduser@master:~$ wc -l googlebooks-eng-all-1gram-20120701-b
 ```
 
-![](Screenshots\q1-b-pig-union-res.jpg)
+![](Screenshots/q1-b-pig-union-res.jpg)
 
 ### **(c)(d) [10+15 Marks]** Calculate average number of occurences per year for each bigram 
 
@@ -103,11 +103,11 @@ hduser@master:~$ hadoop dfs -copyFromLocal gbook-all-res /user/hduser/gbook-all-
 
 Write the Pig script as follows and save it to `bigram_occ_per_year.pig`
 
-\* <u>Statement: to avoid the case of 1 record didn't correspond to 1 year, I didn't use `AVG` function</u>
+/* <u>Statement: to avoid the case of 1 record didn't correspond to 1 year, I didn't use `AVG` function</u>
 
 ```shell
 data = LOAD 'hdfs://master:54310/user/hduser/gbook-all-res' 
-       USING PigStorage('\t') 
+       USING PigStorage('/t') 
        AS (bigram:chararray,year:int,match_count:int,volume_count:int);
 data_groups = GROUP data BY bigram;
 occ_per_year = FOREACH data_groups{
@@ -119,7 +119,7 @@ occ_per_year = FOREACH data_groups{
 occ_per_year_desc = ORDER occ_per_year BY avg_match_count DESC;
 result = LIMIT occ_per_year_desc 20;
 DUMP result;
-STORE occ_per_year INTO 'hdfs://master:54310/user/hduser/pig_result' USING PigStorage('\t');
+STORE occ_per_year INTO 'hdfs://master:54310/user/hduser/pig_result' USING PigStorage('/t');
 ```
 
 Execute the script via `pig -x mapreduce *.pig` command
@@ -130,7 +130,7 @@ hduser@master:~$ pig -x mapreduce bigram_occ_per_year.pig
 
 Results Screenshots and Runtime(693.844s)
 
-![](Screenshots\q1-pig-result.jpg)
+![](Screenshots/q1-pig-result.jpg)
 
 
 
@@ -165,7 +165,7 @@ hduser@master:~$ hadoop dfs -chmod g+w /user/hive/warehouse
 
 Configuring metastore[^4]
 
-\- Install & Configure `mysql` on master/namenode
+/- Install & Configure `mysql` on master/namenode
 
 ```shell
 hduser@master:~$ sudo apt-get install mysql-server
@@ -178,7 +178,7 @@ CREATE DATABASE hive;
 GRANT ALL PRIVILEGES on *.* to root@localhost;
 ```
 
-\- Create `hive-site.xml` under `$HIVE_HOME/conf`
+/- Create `hive-site.xml` under `$HIVE_HOME/conf`
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -211,13 +211,13 @@ GRANT ALL PRIVILEGES on *.* to root@localhost;
 </configuration>
 ```
 
-\- Download `mysql-connector` jar package and copy it under `$HIVE_HOME/lib`[^6]
+/- Download `mysql-connector` jar package and copy it under `$HIVE_HOME/lib`[^6]
 
 ```shell
 hduser@master:~$ sudo cp mysql-connector-java-8.0.27.jar /usr/local/hive/lib
 ```
 
-\- Initialize the mysql database for metastore
+/- Initialize the mysql database for metastore
 
 ```shell
 hduser@master:~$ schematool -dbType mysql -initSchema
@@ -225,11 +225,11 @@ hduser@master:~$ schematool -dbType mysql -initSchema
 
 Checking `hive --version` and Entering the CLI via `hive`
 
-![](Screenshots\q2-a-hive-setup.jpg)
+![](Screenshots/q2-a-hive-setup.jpg)
 
-\- Create a database `hw2` in `hive` and See the metastore info from mysql
+/- Create a database `hw2` in `hive` and See the metastore info from mysql
 
-![](Screenshots\q2-a-hive-setup-2.jpg)
+![](Screenshots/q2-a-hive-setup-2.jpg)
 
 ### **(b) [30 Marks]** Calculate yearly average occurence of bigrams with Hive
 
@@ -249,8 +249,8 @@ CREATE TABLE if not exists gbook_data(
     volume_count INT)
 COMMENT 'hw2_q2_data'
 ROW FORMAT DELIMITED
-FIELDS TERMINATED BY '\t'
-LINES TERMINATED BY '\n'
+FIELDS TERMINATED BY '/t'
+LINES TERMINATED BY '/n'
 STORED AS TEXTFILE;
 ```
 
@@ -273,7 +273,7 @@ SELECT * FROM gbook_data LIMIT 20;
 SELECT * FROM gbook_data WHERE year>2000 LIMIT 10;
 ```
 
-![](Screenshots\q2-b-hive-inspection.jpg)
+![](Screenshots/q2-b-hive-inspection.jpg)
 
 Write HiveQL, and execute the query directly in Hive CLI to calculate the occurance per year. 
 
@@ -291,7 +291,7 @@ LIMIT 20;
 
 Result and Total Runtime: 381.731 seconds
 
-![](Screenshots\q2-b-hive-result.jpg)
+![](Screenshots/q2-b-hive-result.jpg)
 
 Rerun Pig-Script, and compared hive with Pig Performance: 
 
@@ -311,7 +311,7 @@ However, in this case, PIG is slower than HIVE, since PIG schedules 2 more MR jo
 
 
 
-![](Screenshots\q1-pig-result-rerun.jpg)
+![](Screenshots/q1-pig-result-rerun.jpg)
 
 
 
@@ -321,7 +321,7 @@ However, in this case, PIG is slower than HIVE, since PIG schedules 2 more MR jo
 
 **Prerequisite**
 
-\- Download the movielens data and upload to HDFS, Entering the grunt shell
+/- Download the movielens data and upload to HDFS, Entering the grunt shell
 
 ```shell
 $ wget https://mobitec.ie.cuhk.edu.hk/ierg4330/static_files/assignments/movielens_small.csv
@@ -332,7 +332,7 @@ $ hadoop dfs -copyFromLocal movielens_large_updated.csv /user/hduser/movielens_l
 
 **Small Dataset**
 
-\- Pig Scripts for small dataset: `cmn_movie_count_small.pig`
+/- Pig Scripts for small dataset: `cmn_movie_count_small.pig`
 
 ```sql
 /************************************************************************	
@@ -354,10 +354,10 @@ res = FOREACH cmn_movies_groups GENERATE FLATTEN(group),COUNT(cmn_movies_notself
 -- OUTPUT: order then select the top 10 pair of users who watch the most shared movies;
 res = ORDER res BY common_cnt DESC;
 res = LIMIT res 10;
-STORE res INTO './common_small_res' USING PigStorage ('\t');
+STORE res INTO './common_small_res' USING PigStorage ('/t');
 ```
 
-\- Execution and result
+/- Execution and result
 
 ```shell
 $ pig -x mapreduce cmn_movie_count_small.pig
@@ -365,11 +365,11 @@ $ pig -x mapreduce cmn_movie_count_small.pig
 $ hadoop dfs -cat common_small_res/part-v007-o000-r-00000
 ```
 
-![](Screenshots\q3-a-cmn-cnt-small.jpg)
+![](Screenshots/q3-a-cmn-cnt-small.jpg)
 
 **Large Dataset**
 
-\- Pig Scripts for large dataset: `cmn_movie_count_large.pig` identical to `cmn_movie_count_small.pig`, except for the data loading part
+/- Pig Scripts for large dataset: `cmn_movie_count_large.pig` identical to `cmn_movie_count_small.pig`, except for the data loading part
 
 ```sql
 /************************************************************************	
@@ -391,10 +391,10 @@ res = FOREACH cmn_movies_groups GENERATE FLATTEN(group),COUNT(cmn_movies_notself
 -- OUTPUT: order then select the top 10 pair of users who watch the most shared movies;
 res = ORDER res BY common_cnt DESC;
 res = LIMIT res 10;
-STORE res INTO './common_large_res' USING PigStorage ('\t');
+STORE res INTO './common_large_res' USING PigStorage ('/t');
 ```
 
-\- Execution and result
+/- Execution and result
 
 ```shell
 $ pig -x mapreduce cmn_movie_count_large.pig
@@ -402,7 +402,7 @@ $ pig -x mapreduce cmn_movie_count_large.pig
 $ hadoop dfs -cat common_large_res/part-v007-o000-r-00000
 ```
 
-![](Screenshots\q3-a-cmn-cnt-large.jpg)
+![](Screenshots/q3-a-cmn-cnt-large.jpg)
 
 ### **(b) [25 Marks]** Find Top-3 most similar users with Pig
 
@@ -412,7 +412,7 @@ My Student ID <u>1155162635</u> ends with **<u>35</u>** and **<u>2635</u>**
 
 **Small Dataset**
 
-\- Write pig scripts for small dataset: `top3_similar_users_small.pig`
+/- Write pig scripts for small dataset: `top3_similar_users_small.pig`
 
 ```sql
 /************************************************************************	
@@ -482,10 +482,10 @@ res = JOIN user_bag BY userid1 LEFT OUTER, res BY userid;
 -- #3.3: Convert userid into STRING, selecting the results ends with '35'
 my_res = FOREACH res GENERATE (chararray)userid1, top3_userid;
 my_res = FILTER my_res BY ENDSWITH(userid,'35');
-STORE my_res INTO './top3_sim_small' USING PigStorage('\t');
+STORE my_res INTO './top3_sim_small' USING PigStorage('/t');
 ```
 
-\- Execute & Results
+/- Execute & Results
 
 ```shell
 $ pig -x mapreduce top3_similar_users_small.pig
@@ -493,11 +493,11 @@ $ pig -x mapreduce top3_similar_users_small.pig
 $ hadoop dfs -cat top3_sim_small/part-v007-o000-r-00000
 ```
 
-![](Screenshots\q3-b-top3-small.jpg)
+![](Screenshots/q3-b-top3-small.jpg)
 
 **Large Dataset**
 
-\- Similar Pig Scripts:  `top3_similar_users_large.pig`
+/- Similar Pig Scripts:  `top3_similar_users_large.pig`
 
 ```sql
 /************************************************************************	
@@ -567,10 +567,10 @@ res = JOIN user_bag BY userid1 LEFT OUTER, res BY userid;
 -- #3.3: Convert userid into STRING, selecting the results ends with '2635'
 my_res = FOREACH res GENERATE (chararray)userid1, top3_userid;
 my_res = FILTER my_res BY ENDSWITH(userid,'2635');
-STORE my_res INTO './top3_sim_small' USING PigStorage('\t');
+STORE my_res INTO './top3_sim_small' USING PigStorage('/t');
 ```
 
-\- Execute & Results:
+/- Execute & Results:
 
 ```shell
 $ pig -x mapreduce top3_similar_users_large.pig
@@ -581,13 +581,13 @@ $ cat top3_sim_large/* >top3_sim_large_agg
 $ cat top3_sim_large_agg
 ```
 
-![](Screenshots\q3-b-top3-large.jpg)
+![](Screenshots/q3-b-top3-large.jpg)
 
 ### **(c) [20 Bonus]** Find Top-3 most similar users with Hive
 
 **Small dataset**
 
-\- HiveQL Query Scripts: `top3_similar_user_small.hql`
+/- HiveQL Query Scripts: `top3_similar_user_small.hql`
 
 ```sql
 /************************************************************************	
@@ -603,7 +603,7 @@ CREATE TABLE if not exists movielens_small(
 COMMENT 'hw2_movielens_small'
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ','
-LINES TERMINATED BY '\n'
+LINES TERMINATED BY '/n'
 STORED AS TEXTFILE;
 TRUNCATE TABLE movielens_small;
 LOAD DATA INPATH './movielens_small' OVERWRITE INTO TABLE movielens_small;
@@ -647,18 +647,18 @@ FROM
 WHERE CAST(t5.user_id AS STRING) LIKE CONCAT("%","35"); 
 ```
 
-\- Execution & results
+/- Execution & results
 
 ```shell
 $ hive -f top3_similar_users_small.hql > hive_res_small
 $ cat hive_res_small
 ```
 
- ![](Screenshots\q3-c-hive-result-small-rerun.jpg)
+ ![](Screenshots/q3-c-hive-result-small-rerun.jpg)
 
 **Large Dataset**
 
-\- HiveQL Query Scripts: `top3_similar_user_large.hql`: identical except for the table name and data loading 
+/- HiveQL Query Scripts: `top3_similar_user_large.hql`: identical except for the table name and data loading 
 
 ```sql
 /************************************************************************	
@@ -674,7 +674,7 @@ CREATE TABLE if not exists movielens_large(
 COMMENT 'hw2_movielens_large'
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ','
-LINES TERMINATED BY '\n'
+LINES TERMINATED BY '/n'
 STORED AS TEXTFILE;
 TRUNCATE TABLE movielens_large;
 LOAD DATA INPATH './movielens_large' OVERWRITE INTO TABLE movielens_large;
@@ -718,16 +718,16 @@ FROM
 WHERE CAST(t5.user_id AS STRING) LIKE CONCAT("%","2635"); 
 ```
 
-\- Execution & results
+/- Execution & results
 
 ```shell
 $ hive -f top3_similar_users_large.hql > hive_res_large
 $ cat hive_res_large
 ```
 
- ![](Screenshots\q3-c-hive-result-large-rerun.jpg)
+ ![](Screenshots/q3-c-hive-result-large-rerun.jpg)
 
-### **\*Notice for Q3(b)(c)**
+### **/*Notice for Q3(b)(c)**
 
 Some of the results of <u>large dataset</u> produced by PIG didn't match with HIVE, that's because there're several ties in the rank list of similarity and the sorting mechanisms interpreted by HIVE and PIG are different, which you could refer to screenshots below, listing both results along with the top15 similar users for each user.
 
@@ -735,9 +735,9 @@ For example, for user 12635, PIG's top3 is [22573, 26737,<u>31204</u>], and HIVE
 
 | PIG result                                                   | HIVE result                                                  |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| <img src="Screenshots\q3-notice-pig.jpg" style="zoom:50%;" /> | <img src="Screenshots\q3-notice-hive.jpg" style="zoom:50%;" /> |
+| <img src="Screenshots/q3-notice-pig.jpg" style="zoom:50%;" /> | <img src="Screenshots/q3-notice-hive.jpg" style="zoom:50%;" /> |
 
-![](Screenshots\q3-notice.jpg)
+![](Screenshots/q3-notice.jpg)
 
 
 
@@ -747,7 +747,7 @@ Also, I detected user 32635 is missing in both PIG and HIVE results, and this is
 hive> SELECT * FROM movielens_large WHERE user_id=32635;
 ```
 
-![](Screenshots\q3-notice-2.jpg)
+![](Screenshots/q3-notice-2.jpg)
 
 
 

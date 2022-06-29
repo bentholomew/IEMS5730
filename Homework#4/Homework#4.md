@@ -4,7 +4,7 @@
 
 <h2 align=center>Declaration</h2>
 
-![](Screenshots\0-Declaration.jpg)
+![](Screenshots/0-Declaration.jpg)
 
 [TOC]
 
@@ -47,13 +47,13 @@ $ bin/kafka-server-start.sh config/server.properties
 Create a topic named `hw4_q1` on `master` [^2]
 
 ```shell
-$ bin/kafka-topics.sh 	--create --bootstrap-server master:9092,slave1:9092 \
-                        --replication-factor 2 --partitions 2 \
+$ bin/kafka-topics.sh 	--create --bootstrap-server master:9092,slave1:9092 /
+                        --replication-factor 2 --partitions 2 /
                         --topic hw4_q1
 $ bin/kafka-topics.sh --describe --topic hw4_q1 --bootstrap-server master:9092,slave1:9092
 ```
 
-![](Screenshots\q1-a-topic-creation.jpg)
+![](Screenshots/q1-a-topic-creation.jpg)
 
 Write/Read `my test message` event to the topic
 
@@ -64,8 +64,8 @@ $ bin/kafka-console-consumer.sh --bootstrap-server master:9092,slave1:9092 --top
 
 | Operations |              Screenshots               |
 | :--------: | :------------------------------------: |
-|   write    | ![](Screenshots\q1-a-write-events.jpg) |
-|    read    | ![](Screenshots\q1-a-read-events.jpg)  |
+|   write    | ![](Screenshots/q1-a-write-events.jpg) |
+|    read    | ![](Screenshots/q1-a-read-events.jpg)  |
 
 
 
@@ -90,7 +90,7 @@ $ helm repo add incubator https://charts.helm.sh/incubator
 $ helm install -f kafka-value.yml -n s1155162635 kafka incubator/kafka
 ```
 
-![](Screenshots\q1-b-kafka-over-k8s.jpg)
+![](Screenshots/q1-b-kafka-over-k8s.jpg)
 
 Verify the setup
 
@@ -107,8 +107,8 @@ $ bin/kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic my-test-to
 
 | Operations |              Screenshots               |
 | :--------: | :------------------------------------: |
-|   write    | ![](Screenshots\q1-b-write-events.jpg) |
-|    read    | ![](Screenshots\q1-b-read-events.jpg)  |
+|   write    | ![](Screenshots/q1-b-write-events.jpg) |
+|    read    | ![](Screenshots/q1-b-read-events.jpg)  |
 
 
 
@@ -138,7 +138,7 @@ done < new_tweets.txt
 $ /usr/hdp/2.6.5.0-292/kafka/bin/kafka-console-consumer.sh --zookeeper dicvmd7.ie.cuhk.edu.hk:2181 --topic 1155162635_hw4 --from-beginning
 ```
 
-![](Screenshots\q2-producer-write-2.jpg)	
+![](Screenshots/q2-producer-write-2.jpg)	
 
 ```shell
 # Delete and Restart Topic for reset
@@ -175,11 +175,11 @@ if __name__ == '__main__':
     ssc = StreamingContext(sc, 10)
     ssc.checkpoint('./checkpoint')
     kafkaStream = KafkaUtils.createStream(ssc, 'dicvmd7.ie.cuhk.edu.hk:2181', 'consumer', {'1155162635_hw4': 2})
-    counts = kafkaStream.map(lambda x: x[1])\
-                        .map(lambda x: x.split(",2021")[0]) \
-                        .flatMap(lambda x: x.split(" ")) \
-                        .filter(lambda x: x.startswith("#")) \
-                        .map(lambda x: (x,1)) \
+    counts = kafkaStream.map(lambda x: x[1])/
+                        .map(lambda x: x.split(",2021")[0]) /
+                        .flatMap(lambda x: x.split(" ")) /
+                        .filter(lambda x: x.startswith("#")) /
+                        .map(lambda x: (x,1)) /
                         .reduceByKeyAndWindow(lambda x,y:x+y, lambda x,y: x-y, 300, 120) # WinLength: 5min // Interval: 2min 
     counts.foreachRDD(process_rdd)
     ssc.start()
@@ -192,20 +192,20 @@ Execute the `tweets_producer.sh`[^9] and `tweets_consumer.py` <u>at the same tim
 # Producer
 $ nohup ./tweets_producer.sh &
 # Consumer
-$ spark-submit \
-    --master yarn \
-    --deploy-mode cluster \
-    --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.3.0 \
+$ spark-submit /
+    --master yarn /
+    --deploy-mode cluster /
+    --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.3.0 /
     tweets_consumer.py
 ```
 
-![](Screenshots\q2-producer-consumer-running.jpg)
+![](Screenshots/q2-producer-consumer-running.jpg)
 
 Output sample for 1h (22:30~23:30) : Check the `stdout` at Yarn WebUI/applicationID/logs <u>(**Please Zoom to see the high-resolution screenshot**)</u>
 
-\- Calculate and Output the last 5 minutes top30 hashtags every 2 minutes 
+/- Calculate and Output the last 5 minutes top30 hashtags every 2 minutes 
 
-<img src="Screenshots\q2-consumer-log.png" style="zoom: 150%;" />
+<img src="Screenshots/q2-consumer-log.png" style="zoom: 150%;" />
 
 ### Over IE k8s Cluster (Fail)
 
@@ -252,8 +252,8 @@ Check the topic `tweets` producing/consuming status via console:
 
 |   Operations    |              Screenshots               |
 | :-------------: | :------------------------------------: |
-| write(producer) | ![](Screenshots\q2-producer-write.jpg) |
-| read(consumer)  | ![](Screenshots\q2-producer-read.jpg)  |
+| write(producer) | ![](Screenshots/q2-producer-write.jpg) |
+| read(consumer)  | ![](Screenshots/q2-producer-read.jpg)  |
 
 Consumer: `tweets_consumer.scala` , built with `sbt`and save to  `~/examples/examples/jars/simple-project_2.12-1.0.jar`, spark version: 3.2.1
 
@@ -296,11 +296,11 @@ object WordCountTest {
                     PreferConsistent,
                     Subscribe[String, String](topics, kafkaParams)
                     )
-    val counts = kafkaStream.map(_._1)\
-                      .map(record=>record.split(",2021")._1) \
-                      .flatMap(_.split(" ")) \
-                      .filter(_.startswith("#")) \
-                      .map((_,1)) \
+    val counts = kafkaStream.map(_._1)/
+                      .map(record=>record.split(",2021")._1) /
+                      .flatMap(_.split(" ")) /
+                      .filter(_.startswith("#")) /
+                      .map((_,1)) /
                       .reduceByKeyAndWindow(_+_,_-_ ,Seconds(30),Seconds(10))
 
     stream.foreachRDD(rdd => {
@@ -319,21 +319,21 @@ Submit the streaming job to IE DIC k8s cluster, with multiple dependencies:
 ```shell
 $ bin/docker-image-tool.sh -r docker.io/s1155162635 -t v3.2.1 build
 $ bin/docker-image-tool.sh -r s1155162635 -t v3.2.1 push
-$ bin/spark-submit \
-        --master k8s://https://172.16.5.98:6443 \
-        --jars local:///opt/spark/examples/jars/kafka-clients-2.8.0.jar,local:///opt/spark/examples/jars/spark-streaming-kafka-0-10_2.12-3.2.1.jar,local:///opt/spark/examples/jars/spark-token-provider-kafka-0-10_2.12-3.2.1.jar \
-        --class "StationJourneyCountDirectApp" \
-        --deploy-mode cluster \
-        --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
-        --conf spark.kubernetes.namespace=s1155162635 \
-        --conf spark.kubernetes.container.image=docker.io/s1155162635/spark:v3.2.1 \
-        --conf spark.kubernetes.container.image.pullPolicy=Always \
+$ bin/spark-submit /
+        --master k8s://https://172.16.5.98:6443 /
+        --jars local:///opt/spark/examples/jars/kafka-clients-2.8.0.jar,local:///opt/spark/examples/jars/spark-streaming-kafka-0-10_2.12-3.2.1.jar,local:///opt/spark/examples/jars/spark-token-provider-kafka-0-10_2.12-3.2.1.jar /
+        --class "StationJourneyCountDirectApp" /
+        --deploy-mode cluster /
+        --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark /
+        --conf spark.kubernetes.namespace=s1155162635 /
+        --conf spark.kubernetes.container.image=docker.io/s1155162635/spark:v3.2.1 /
+        --conf spark.kubernetes.container.image.pullPolicy=Always /
         local:///opt/spark/examples/jars/simple-project_2.12-1.0.jar
 ```
 
 Container keeps running, but there's no input from kafka. Throwing error of `Kafka010ConfigFailure`, unable to connect with kafka pods
 
-![](Screenshots\q2-k8s-cannot-connect-kafka-pods.jpg)
+![](Screenshots/q2-k8s-cannot-connect-kafka-pods.jpg)
 
 ## **Q3 [40 Marks]** Spark Structured Streaming on Kafka
 
@@ -370,78 +370,78 @@ from pyspark.sql.functions import *
 from pyspark.sql import functions as F
 from pyspark.sql.window import Window
 
-spark = SparkSession \
-    .builder \
-    .appName("tweets_consumer_structured") \
+spark = SparkSession /
+    .builder /
+    .appName("tweets_consumer_structured") /
     .getOrCreate()
 
-df = spark.readStream \
-    .format("kafka") \
-    .option("kafka.bootstrap.servers", "dicvmd7.ie.cuhk.edu.hk:6667") \
-    .option("subscribe", "1155162635_hw4_2") \
+df = spark.readStream /
+    .format("kafka") /
+    .option("kafka.bootstrap.servers", "dicvmd7.ie.cuhk.edu.hk:6667") /
+    .option("subscribe", "1155162635_hw4_2") /
     .load()
 
 lines = df.selectExpr("CAST(timestamp AS TIMESTAMP)","CAST(value AS STRING)")
-words = lines.withColumn("contents",split('value', ",2021")) \
-				.select(col("contents")[0].alias("contents"),'timestamp')\
+words = lines.withColumn("contents",split('value', ",2021")) /
+				.select(col("contents")[0].alias("contents"),'timestamp')/
 				.withColumn("words",explode(split('contents',' ')))
 hashtags = words.filter(words.words.startswith("#"))
-hashtags_cnt = hashtags.withWatermark('timestamp','5 minutes')\
+hashtags_cnt = hashtags.withWatermark('timestamp','5 minutes')/
 					   .groupBy(
                        		window('timestamp',"5 minutes", "2 minutes"),
-                       		hashtags.words)\
+                       		hashtags.words)/
     				   .count().orderBy([asc('window'),desc('count')])
 '''
 	Error: 
 	Non time-based window func is not supported on Streaming DataFrames/Dataset  
     # hashtags_rank = hashtags_cnt.withColumn("rank",row_number().over(Window.partitionBy('window').orderBy(desc("count"))))
     # hashtags_top = hashtags_rank.filter(hashtags_rank.rank<=5)
-    # query = hashtags_cnt.writeStream \
-    #         .format("console") \
-    #        .outputMode("complete")\
-    #        .option("truncate",False)\
-    #        .trigger(processingTime='10 seconds')\
+    # query = hashtags_cnt.writeStream /
+    #         .format("console") /
+    #        .outputMode("complete")/
+    #        .option("truncate",False)/
+    #        .trigger(processingTime='10 seconds')/
     #        .start()
 
 '''
 
 # Starts streaming and save the results into memory 
-query = hashtags_cnt.writeStream \
-        			.queryName("hashtag_cnts") \
-    				.outputMode("complete") \
-        			.format("memory") \
-            		.trigger(processingTime='5 minutes')\
+query = hashtags_cnt.writeStream /
+        			.queryName("hashtag_cnts") /
+    				.outputMode("complete") /
+        			.format("memory") /
+            		.trigger(processingTime='5 minutes')/
         			.start()           
 ```
 
-![](Screenshots\q3-streaming-pipeline.jpg)
+![](Screenshots/q3-streaming-pipeline.jpg)
 
 Sample Results for 34 minutes(22:18-22:51) streaming: (**Please Zoom to see the high-resolution screenshot**)
 
 ```shell
 # In the same consumer terminal, read the complete table from memory and rank the counts of each time window
-hashtags_rank = spark.sql("SELECT * FROM hashtag_cnts") \
+hashtags_rank = spark.sql("SELECT * FROM hashtag_cnts") /
 			  .withColumn("rank",row_number().over(Window.partitionBy('window').orderBy(desc("count"))))
     
-hashtags_top = hashtags_rank.filter(hashtags_rank.rank<=30) \
-							.withColumn("res",concat_ws(':',col('words'),col('count')))\
+hashtags_top = hashtags_rank.filter(hashtags_rank.rank<=30) /
+							.withColumn("res",concat_ws(':',col('words'),col('count')))/
                             .groupBy('window').agg(collect_list('res'))
 hashtags_top.show(50,truncate=False)
 ```
 
-<img src="Screenshots\q3-streaming-result.jpg" style="zoom:100%;" />
+<img src="Screenshots/q3-streaming-result.jpg" style="zoom:100%;" />
 
-**\*Notice:**
+**/*Notice:**
 
 Problems Encountered: Cannot directly output the Top30 Hashtags before `writestream`
 
-\- Sorting in `append`/`update` mode is not supported, only `complete  ` is supported. Therefore, the console/memory can't output/store the latest batch dataframes of the time window. It's only allowed to output the entire table from the streams begins. 
+/- Sorting in `append`/`update` mode is not supported, only `complete  ` is supported. Therefore, the console/memory can't output/store the latest batch dataframes of the time window. It's only allowed to output the entire table from the streams begins. 
 
-![](Screenshots\q3-sorting-problem.jpg)
+![](Screenshots/q3-sorting-problem.jpg)
 
-\- Non time-based window func is not supported on Streaming DataFrames/Dataset, and under the context of `complete` output mode, it seems <u>not possible</u> to output the Top N hashtags within each window group in writestream
+/- Non time-based window func is not supported on Streaming DataFrames/Dataset, and under the context of `complete` output mode, it seems <u>not possible</u> to output the Top N hashtags within each window group in writestream
 
-![](Screenshots\q3-window-problem.jpg)
+![](Screenshots/q3-window-problem.jpg)
 
 Solutions and results:
 
@@ -464,42 +464,42 @@ from pyspark.sql.window import Window
 
 
 if __name__ == '__main__':
-    spark = SparkSession \
-        .builder \
-        .appName("tweets_consumer_structured") \
+    spark = SparkSession /
+        .builder /
+        .appName("tweets_consumer_structured") /
         .getOrCreate()
 
-    df = spark.readStream \
-        .format("kafka") \
-        .option("kafka.bootstrap.servers", "kafka-headless:9092") \
-        .option("subscribe", "tweets") \
+    df = spark.readStream /
+        .format("kafka") /
+        .option("kafka.bootstrap.servers", "kafka-headless:9092") /
+        .option("subscribe", "tweets") /
         .load()
 
     lines = df.selectExpr("CAST(timestamp AS TIMESTAMP)","CAST(value AS STRING)")
-    words = lines.withColumn("contents",split('value', ",2021")) \
-                    .select(col("contents")[0].alias("contents"),'timestamp')\
+    words = lines.withColumn("contents",split('value', ",2021")) /
+                    .select(col("contents")[0].alias("contents"),'timestamp')/
                     .withColumn("words",explode(split('contents',' ')))
     hashtags = words.filter(words.words.startswith("#"))
-    hashtags_cnt = hashtags.withWatermark('timestamp','5 minutes')\
+    hashtags_cnt = hashtags.withWatermark('timestamp','5 minutes')/
                            .groupBy(
                                 window('timestamp',"5 minutes", "2 minutes"),
-                                hashtags.words)\
+                                hashtags.words)/
                            .count().orderBy([asc('window'),desc('count')])
     # Starts streaming and save the results into memory 
-    query = hashtags_cnt.writeStream \
-                        .queryName("hashtag_cnts") \
-                        .outputMode("complete") \
-                        .format("memory") \
-                        .trigger(processingTime='5 minutes')\
+    query = hashtags_cnt.writeStream /
+                        .queryName("hashtag_cnts") /
+                        .outputMode("complete") /
+                        .format("memory") /
+                        .trigger(processingTime='5 minutes')/
                         .start()
     query.awaitTermination()
     # Print the output at a 2-minute interval, same as the sliding interval
     while True:
         time.sleep(120)
-        hashtags_rank = spark.sql("SELECT * FROM hashtag_cnts") \
+        hashtags_rank = spark.sql("SELECT * FROM hashtag_cnts") /
                   .withColumn("rank",row_number().over(Window.partitionBy('window').orderBy(desc("count")))) 
-        hashtags_top = hashtags_rank.filter(hashtags_rank.rank<=30) \
-                                    .withColumn("res",concat_ws(':',col('words'),col('count')))\
+        hashtags_top = hashtags_rank.filter(hashtags_rank.rank<=30) /
+                                    .withColumn("res",concat_ws(':',col('words'),col('count')))/
                                     .groupBy('window').agg(collect_list('res'))
         hashtags_top.show(50,truncate=False)
 ```
@@ -512,17 +512,17 @@ $ bin/docker-image-tool.sh -r s1155162635 -t v3.2.1 push
 # Start the producer pod
 $ kubectl exec -it testclient bash -n s1155162635 -- ./producer.sh 
 # Submit the consumer code to a Spark pod
-$ bin/spark-submit \
-     --master k8s://https://172.16.5.98:6443 \
-     --deploy-mode cluster \
-     --name tweets_count \
-     --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.2.1 \
-     --conf spark.app.name=tweets_count \
-     --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
-     --conf spark.kubernetes.namespace=s1155162635 \
-     --conf spark.kubernetes.container.image=docker.io/s1155162635/spark-py:v3.2.1 \
-     --conf spark.kubernetes.container.image.pullPolicy=Always \
-      --conf spark.driver.extraJavaOptions="-Divy.cache.dir=/tmp -Divy.home=/tmp" \
+$ bin/spark-submit /
+     --master k8s://https://172.16.5.98:6443 /
+     --deploy-mode cluster /
+     --name tweets_count /
+     --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.2.1 /
+     --conf spark.app.name=tweets_count /
+     --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark /
+     --conf spark.kubernetes.namespace=s1155162635 /
+     --conf spark.kubernetes.container.image=docker.io/s1155162635/spark-py:v3.2.1 /
+     --conf spark.kubernetes.container.image.pullPolicy=Always /
+      --conf spark.driver.extraJavaOptions="-Divy.cache.dir=/tmp -Divy.home=/tmp" /
      local:///opt/spark/examples/src/main/python/tweets_consumer_2.py
 ```
 
@@ -530,7 +530,7 @@ Failed when read stream from kafka: functions well except from reading input fro
 
 Same as Q2.
 
-![](C:\Users\Bentholomew\Documents\IE@2021\1-Course\IEMS5730\Assignments\Homework#4\Screenshots\q3-k8s-cannot-connect-kafka-pods.jpg)
+![](C:/Users/Bentholomew/Documents/IE@2021/1-Course/IEMS5730/Assignments/Homework#4/Screenshots/q3-k8s-cannot-connect-kafka-pods.jpg)
 
 
 
