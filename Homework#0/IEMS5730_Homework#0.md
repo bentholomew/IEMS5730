@@ -4,7 +4,7 @@
 
 <h2 align="center">Declaration</h2>
 
-![](Screenshots\Declaration.png)
+![](Screenshots/Declaration.png)
 
 [TOC]
 
@@ -52,7 +52,7 @@
   hduser@master-single-node:~$java -version
   ```
 
-  ![](Screenshots\1.1-Single-Node-Java-Config.png)
+  ![](Screenshots/1.1-Single-Node-Java-Config.png)
 
 - **Installing & Configuring Hadoop**[^2][^3]
 
@@ -146,7 +146,7 @@
 
   Screenshot of `port 50070`
 
-  ![](Screenshots\1.2-Single-Node-Hadoop-Setup.png)
+  ![](Screenshots/1.2-Single-Node-Hadoop-Setup.png)
 
 ### ii. Run the TeraSort Program on a single-node hadoop
 
@@ -162,15 +162,15 @@
 
   -TeraGen Result
 
-  ![](Screenshots\1.3-TeraGen.png)
+  ![](Screenshots/1.3-TeraGen.png)
 
   -TeraSort Result
 
-  ![](Screenshots\1.4-TeraSort.png)
+  ![](Screenshots/1.4-TeraSort.png)
 
   -TeraValidate Result
 
-  ![](Screenshots\1.5-TeraValidate.png)
+  ![](Screenshots/1.5-TeraValidate.png)
 
 
 
@@ -201,7 +201,7 @@
 
   -Backup the image of this `NameNode` instance, create 3 `DataNode` instances from the image, name them in sequence `slave1` / `slave2` / `slave3` (select the same network region: asia-east2-a)
 
-  ![Successfully Creating 4 instances](Screenshots\2.2-Creating-4-instances.png)
+  ![Successfully Creating 4 instances](Screenshots/2.2-Creating-4-instances.png)
 
 - **Building SSH connection among the machines**[^7]
 
@@ -420,9 +420,9 @@
 
 - **Result**
 
-  ![jps on 4 instances after setup](Screenshots\2.3-jps-verification-after-setup.png)
+  ![jps on 4 instances after setup](Screenshots/2.3-jps-verification-after-setup.png)
 
-  ![Namenode:50070](Screenshots\2.4-NameNode-50070.png)
+  ![Namenode:50070](Screenshots/2.4-NameNode-50070.png)
 
 ### ii. Generate 2 different datasets of 2GB and 20GB,Run the Terasort Program with multi-node Hadoop cluster, and compare the running time
 
@@ -452,7 +452,7 @@
 
   20GB: Total Time(14800s) = Teragen(192s) + Terasort(14416s) + TeraValidate(192s)
 
-  ![Terasort Result Comparison](Screenshots\2.5-TeraSort-2GB&20GB.png)
+  ![Terasort Result Comparison](Screenshots/2.5-TeraSort-2GB&20GB.png)
 
 ## **Part c[40 Marks]** Running the Python Code on Hadoop[^9]
 
@@ -477,7 +477,7 @@
           # Reduce step, i.e. the input for reducer.py
           #
           # tab-delimited; the trivial word count is 1
-          print ('%s\t%s' % (word, 1))
+          print ('%s/t%s' % (word, 1))
   ```
 
 - **Creating reducer.py and save it to /home/hduser**
@@ -499,7 +499,7 @@
       line = line.strip()
   
       # parse the input we got from mapper.py
-      word, count = line.split('\t', 1)
+      word, count = line.split('/t', 1)
   
       # convert count (currently a string) to int
       try:
@@ -516,13 +516,13 @@
       else:
           if current_word:
               # write result to STDOUT
-              print '%s\t%s' % (current_word, current_count)
+              print '%s/t%s' % (current_word, current_count)
           current_count = count
           current_word = word
   
   # do not forget to output the last word if needed!
   if current_word == word:
-      print ('%s\t%s' % (current_word, current_count))
+      print ('%s/t%s' % (current_word, current_count))
   ```
 
 - **Testing the mapper.py and reducer.py script**[^10]
@@ -544,7 +544,7 @@
   hduser@master:~$ cat /home/hduser/shakespeare | /home/hduser/mapper.py #checking the scripts locally
   ```
 
-  ![](Screenshots\3.1-wordcount-mapper-local.png)
+  ![](Screenshots/3.1-wordcount-mapper-local.png)
 
 - **Copy local example data to HDFS**
 
@@ -555,20 +555,20 @@
   hduser@master:~$ hadoop dfs -ls
   ```
 
-  ![](Screenshots\3.2-hdfs-copyFromLocal.png)
+  ![](Screenshots/3.2-hdfs-copyFromLocal.png)
 
 - **Run the MapReduce job using streaming**[^11][^12][^13]
 
   ```shell
-  hduser@master:~$ hadoop jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.9.2.jar \
-   				 -file /home/hduser/mapper.py -mapper /home/hduser/mapper.py \
-    				 -file /home/hduser/reducer.py -reducer /home/hduser/reducer.py \
+  hduser@master:~$ hadoop jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.9.2.jar /
+   				 -file /home/hduser/mapper.py -mapper /home/hduser/mapper.py /
+    				 -file /home/hduser/reducer.py -reducer /home/hduser/reducer.py /
     				 -input /user/hduser/shakespeare -output /user/hduser/shakespeare-output
   ```
 
-  ![3.3-Hadoop-Streaming-Result](Screenshots\3.3-WordCount-Python-Terminal-Output.png)
+  ![3.3-Hadoop-Streaming-Result](Screenshots/3.3-WordCount-Python-Terminal-Output.png)
 
-  ![](Screenshots\3.4-WordCount-Python-Job-Tracker.png)
+  ![](Screenshots/3.4-WordCount-Python-Job-Tracker.png)
 
   The total running time is **24s**
 
@@ -580,7 +580,7 @@
 
   -Download and Open part-00000 file locally as follows:
 
-  ![WordCountPy-Result](Screenshots\3.5-WordCount-Python-Part00000.png)
+  ![WordCountPy-Result](Screenshots/3.5-WordCount-Python-Part00000.png)
 
 ## **Part d[Bonus 10 Marks]** Compiling the Java WordCount program for MapReduce[^14]
 
@@ -666,9 +666,9 @@
   hduser@master:~$ hadoop jar wc.jar WordCount /user/hduser/shakespeare /user/hduser/shakespeare-output-java
   ```
 
-  ![](Screenshots\4.1-WordCount-Java-Terminal-Output.png)
+  ![](Screenshots/4.1-WordCount-Java-Terminal-Output.png)
 
-  ![](Screenshots\4.2-WordCount-Java-Job-Tracker.png)
+  ![](Screenshots/4.2-WordCount-Java-Job-Tracker.png)
 
   Can see from the nodemanager that total running time is **19s** ,5s faster than python streaming.
 
@@ -678,7 +678,7 @@
   hduser@master:~$ hadoop dfs -copyToLocal /user/hduser/shakespeare-output-java /home/hduser
   ```
 
-  ![](Screenshots\4.3-WordCount-Java-Part00000.png)
+  ![](Screenshots/4.3-WordCount-Java-Part00000.png)
 
 ## **Reference**
 
