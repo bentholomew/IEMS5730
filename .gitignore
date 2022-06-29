@@ -12,4 +12,4 @@ crimes/
 *.pdf
 *mysql*/
 *Drafts*
-.gitignore
+*useless*
